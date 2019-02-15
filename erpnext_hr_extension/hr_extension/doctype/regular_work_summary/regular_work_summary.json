@@ -122,10 +122,10 @@
  "max_attachments": 0,
  "modified": "2019-02-06 12:16:44.455947",
  "modified_by": "Administrator",
- "module": "NT Extension",
+ "module": "HR Extension",
  "name": "Regular Work Summary",
  "name_case": "",
- "owner": "aleksas@neurotechnology.com",
+ "owner": "ant.kampo@gmail.com",
  "permissions": [
   {
    "amend": 0, 
