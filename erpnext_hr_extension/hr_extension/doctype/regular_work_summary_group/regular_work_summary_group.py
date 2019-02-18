@@ -7,7 +7,7 @@ import frappe
 from frappe.model.document import Document
 import frappe.utils
 from frappe import _
-from erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary import get_user_emails_from_group
+from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group
 
 class RegularWorkSummaryGroup(Document):
 	def validate(self):
