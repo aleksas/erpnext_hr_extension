@@ -90,23 +90,23 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"erpnext_hr_extension.tasks.all"
 # 	],
-# 	"daily": [
-# 		"erpnext_hr_extension.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"erpnext_hr_extension.tasks.hourly"
-# 	],
+ 	"hourly": [
+		'erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.trigger_emails',
+ 	],
+ 	"daily": [
+		"erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.send_summary",
+ 	],
 # 	"weekly": [
 # 		"erpnext_hr_extension.tasks.weekly"
 # 	]
 # 	"monthly": [
 # 		"erpnext_hr_extension.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------

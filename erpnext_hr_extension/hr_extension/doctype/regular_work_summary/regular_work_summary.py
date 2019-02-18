@@ -11,7 +11,6 @@ from erpnext.hr.doctype.employee.employee import is_holiday
 from frappe.utils import global_date_format
 from six import string_types
 
-
 class RegularWorkSummary(Document):
 	def send_mails(self, dws_group, emails):
 		'''Send emails to get regular work summary to all users \
@@ -102,7 +101,6 @@ class RegularWorkSummary(Document):
 			)),
 			did_not_reply=', '.join(did_not_reply) or '',
 			did_not_reply_title=_('No replies from'))
-
 
 def get_user_emails_from_group(group):
 	'''Returns list of email of enabled users from the given group
