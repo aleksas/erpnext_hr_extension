@@ -31,7 +31,7 @@ class RegularWorkSummary(Document):
 	def send_summary(self):
 		'''Send summary of all replies. Called at midnight'''
 		args = self.get_message_details()
-		emails = get_user_emails_from_group(self.regular_work_summary_group)
+		emails = get_user_emails_from_group(self.regular_work_summary_group, 'Summary')
 		frappe.sendmail(recipients=emails,
 			template='daily_work_summary',
 			args=args,
@@ -103,7 +103,7 @@ class RegularWorkSummary(Document):
 			did_not_reply=', '.join(did_not_reply) or '',
 			did_not_reply_title=_('No replies from'))
 
-def get_user_emails_from_group(group):
+def get_user_emails_from_group(group, receive='Both'):
 	'''Returns list of email of enabled users from the given group
 
 	:param group: Regular Work Summary Group `name`'''
@@ -111,10 +111,10 @@ def get_user_emails_from_group(group):
 	if isinstance(group_doc, string_types):
 		group_doc = frappe.get_doc('Regular Work Summary Group', group)
 
-	emails = get_users_email(group_doc)
+	emails = get_users_email(group_doc, receive)
 
 	return emails
 
-def get_users_email(doc):
+def get_users_email(doc, receive):
 	return [d.email for d in doc.users
-		if frappe.db.get_value("User", d.user, "enabled")]
+		if frappe.db.get_value("User", d.user, "enabled") and (d.receive == receive or d.receive == 'Both')]
