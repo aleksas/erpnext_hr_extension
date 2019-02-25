@@ -95,7 +95,7 @@ scheduler_events = {
 # 		"erpnext_hr_extension.tasks.all"
 # 	],
  	"hourly": [
-		'erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.trigger_emails',
+		"erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.trigger_emails",
  	],
  	"daily": [
 		"erpnext_hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.send_summary",

@@ -4,10 +4,12 @@
 
 from __future__ import unicode_literals
 import frappe
-from frappe.model.document import Document
 import frappe.utils
+from frappe.model.document import Document
 from frappe import _
 from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group
+from calendar import day_name, month_name, monthrange
+from datetime.datetime import today
 
 class RegularWorkSummaryGroup(Document):
 	def validate(self):
@@ -22,7 +24,10 @@ def trigger_emails():
 	for d in groups:
 		print(d.name)
 		group_doc = frappe.get_doc("Regular Work Summary Group", d)
-		if True or (is_current_hour(group_doc.send_emails_at)
+
+		if (is_current_hour(group_doc)
+			and is_current_day(group_doc)
+			and is_current_month(group_doc)
 			and not is_holiday_today(group_doc.holiday_list)
 			and group_doc.enabled):
 			emails = get_user_emails_from_group(group_doc)
@@ -34,9 +39,25 @@ def trigger_emails():
 				).insert()
 				regular_work_summary.send_mails(group_doc, emails)
 
-
-def is_current_hour(hour):
+def is_current_hour(group_doc):
+	hour = group_doc.send_emails_at
 	return frappe.utils.nowtime().split(':')[0] == hour.split(':')[0]
+
+def is_current_day(group_doc):
+	if group_doc.send_emails_frequency == 'Weekly':
+		return day_name[today().weekday()] == group_doc.send_emails_week_day
+	elif group_doc.send_emails_frequency in ['Monthly', 'Yearly']:
+		month_day = group_doc.send_emails_month_day
+		if month_day < 0:
+			month_day += monthrange(today().year, today().month)[1] + 1
+		return today().day == month_day
+
+	return True
+
+def is_current_month(group_doc):
+	if group_doc.send_emails_frequency == 'Yearly':
+		return month_name[today().month] == group_doc.send_emails_month
+	return True
 
 def is_holiday_today(holiday_list):
 	date = frappe.utils.today()
