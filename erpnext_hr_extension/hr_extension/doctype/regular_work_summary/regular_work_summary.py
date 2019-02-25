@@ -33,7 +33,7 @@ class RegularWorkSummary(Document):
 		args = self.get_message_details()
 		emails = get_user_emails_from_group(self.regular_work_summary_group)
 		frappe.sendmail(recipients=emails,
-			template='regular_work_summary',
+			template='daily_work_summary',
 			args=args,
 			subject=_(self.regular_work_summary_group),
 			reference_doctype=self.doctype,

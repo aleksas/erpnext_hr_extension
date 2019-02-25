@@ -9,7 +9,7 @@ from frappe.model.document import Document
 from frappe import _
 from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group
 from calendar import day_name, month_name, monthrange
-from datetime.datetime import today
+from datetime import datetime
 
 class RegularWorkSummaryGroup(Document):
 	def validate(self):
@@ -45,18 +45,19 @@ def is_current_hour(group_doc):
 
 def is_current_day(group_doc):
 	if group_doc.send_emails_frequency == 'Weekly':
-		return day_name[today().weekday()] == group_doc.send_emails_week_day
+		return day_name[datetime.today().weekday()] == group_doc.send_emails_week_day
 	elif group_doc.send_emails_frequency in ['Monthly', 'Yearly']:
-		month_day = group_doc.send_emails_month_day
+		month_day = int(group_doc.send_emails_month_day)
+		today = datetime.today()
 		if month_day < 0:
-			month_day += monthrange(today().year, today().month)[1] + 1
-		return today().day == month_day
+			month_day += monthrange(today.year, today.month)[1] + 1
+		return today.day == month_day
 
 	return True
 
 def is_current_month(group_doc):
 	if group_doc.send_emails_frequency == 'Yearly':
-		return month_name[today().month] == group_doc.send_emails_month
+		return month_name[datetime.today().month] == group_doc.send_emails_month
 	return True
 
 def is_holiday_today(holiday_list):
