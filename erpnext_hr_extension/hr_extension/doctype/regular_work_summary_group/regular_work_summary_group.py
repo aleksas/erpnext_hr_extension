@@ -20,13 +20,15 @@ def trigger_emails():
 			them what did they work on today'''
 	groups = frappe.get_all("Regular Work Summary Group")
 	for d in groups:
+		print(d.name)
 		group_doc = frappe.get_doc("Regular Work Summary Group", d)
-		if (is_current_hour(group_doc.send_emails_at)
+		if True or (is_current_hour(group_doc.send_emails_at)
 			and not is_holiday_today(group_doc.holiday_list)
 			and group_doc.enabled):
 			emails = get_user_emails_from_group(group_doc)
 			# find emails relating to a company
 			if emails:
+				print(emails)
 				regular_work_summary = frappe.get_doc(
 					dict(doctype='Regular Work Summary', regular_work_summary_group=group_doc.name)
 				).insert()
