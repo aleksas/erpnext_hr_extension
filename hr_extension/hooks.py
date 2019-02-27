@@ -90,23 +90,23 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"hr_extension.tasks.all"
 # 	],
-# 	"daily": [
-# 		"hr_extension.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"hr_extension.tasks.hourly"
-# 	],
+ 	"hourly": [
+		"hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.trigger_emails",
+ 	],
+ 	"daily": [
+		"hr_extension.hr_extension.doctype.regular_work_summary_group.regular_work_summary_group.send_summary",
+ 	],
 # 	"weekly": [
 # 		"hr_extension.tasks.weekly"
 # 	]
 # 	"monthly": [
 # 		"hr_extension.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------
