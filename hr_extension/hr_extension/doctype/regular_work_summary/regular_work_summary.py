@@ -12,18 +12,18 @@ from frappe.utils import global_date_format
 from six import string_types
 
 class RegularWorkSummary(Document):
-	def send_mails(self, dws_group, emails):
+	def send_mails(self, rws_group, emails):
 		'''Send emails to get regular work summary to all users \
 			in selected regular work summary group'''
+
 		incoming_email_account = frappe.db.get_value('Email Account',
 			dict(enable_incoming=1, default_incoming=1),
 				'email_id')
-		print(emails, incoming_email_account)
 
 		self.db_set('email_sent_to', '\n'.join(emails))
 		frappe.sendmail(recipients=emails,
-			message=dws_group.message,
-			subject=dws_group.subject,
+			message=rws_group.message,
+			subject=rws_group.subject,
 			reference_doctype=self.doctype,
 			reference_name=self.name,
 			reply_to=incoming_email_account)
