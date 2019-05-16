@@ -7,7 +7,7 @@ import frappe
 import frappe.utils
 from frappe.model.document import Document
 from frappe import _
-from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group, EmailType
+from erpnext_hr_extension.hr_extension.doctype.regular_work_summary.regular_work_summary import get_user_emails_from_group, EmailType
 from calendar import day_name, month_name, monthrange
 from datetime import datetime
 
