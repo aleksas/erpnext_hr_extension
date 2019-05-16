@@ -7,7 +7,7 @@ import frappe
 import frappe.utils
 from frappe.model.document import Document
 from frappe import _
-from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group
+from erpnext_hr_extension.hr_extension.doctype.regular_work_summary	.regular_work_summary import get_user_emails_from_group, EmailType
 from calendar import day_name, month_name, monthrange
 from datetime import datetime
 
@@ -22,32 +22,40 @@ def trigger_emails():
 			them what did they work on today'''
 	groups = frappe.get_all("Regular Work Summary Group")
 	for d in groups:
-		print(d)
 		group_doc = frappe.get_doc("Regular Work Summary Group", d)
+		group_enabled_and_not_holiday = not is_holiday_today(group_doc.holiday_list) and group_doc.enabled
 
-		if (is_current_hour(group_doc)
-			and is_current_day(group_doc)
-			and is_current_month(group_doc)
-			and not is_holiday_today(group_doc.holiday_list)
-			and group_doc.enabled):
-			emails = get_user_emails_from_group(group_doc, 'Reminder')
-			# find emails relating to a company
-			if emails:
-				print(emails)
-				regular_work_summary = frappe.get_doc(
-					dict(doctype='Regular Work Summary', regular_work_summary_group=group_doc.name)
-				).insert()
-				regular_work_summary.send_mails(group_doc, emails)
+		if group_enabled_and_not_holiday:
 
-def is_current_hour(group_doc):
-	hour = group_doc.send_emails_at
+			if (is_current_hour(group_doc, EmailType.REMINDER)
+				and is_current_day(group_doc, EmailType.REMINDER)
+				and is_current_month(group_doc, EmailType.REMINDER)):
+				emails = get_user_emails_from_group(group_doc, EmailType.REMINDER)
+				# find emails relating to a company
+				if emails:
+					regular_work_summary = frappe.get_doc(
+						dict(doctype='Regular Work Summary', regular_work_summary_group=group_doc.name)
+					).insert()
+					regular_work_summary.send_mails(group_doc, emails)
+			
+			if (is_current_hour(group_doc, EmailType.SUMMARY)
+				and is_current_day(group_doc, EmailType.SUMMARY)
+				and is_current_month(group_doc, EmailType.SUMMARY)):
+
+				for d in frappe.get_all('Regular Work Summary', dict(status='Open', regular_work_summary_group=group_doc.name)):
+					regular_work_summary = frappe.get_doc('Regular Work Summary', d.name)
+					regular_work_summary.send_summary()
+
+def is_current_hour(group_doc, email_type):
+	hour = group_doc.send_emails_at if email_type == EmailType.REMINDER else group_doc.send_summary_emails_at
 	return frappe.utils.nowtime().split(':')[0] == hour.split(':')[0]
 
-def is_current_day(group_doc):
+def is_current_day(group_doc, email_type):
 	if group_doc.send_emails_frequency == 'Weekly':
-		return day_name[datetime.today().weekday()] == group_doc.send_emails_week_day
+		week_day = group_doc.send_emails_week_day if email_type == EmailType.REMINDER else group_doc.send_summary_emails_week_day
+		return day_name[datetime.today().weekday()] == week_day
 	elif group_doc.send_emails_frequency in ['Monthly', 'Yearly']:
-		month_day = int(group_doc.send_emails_month_day)
+		month_day = int(group_doc.send_emails_month_day if email_type == EmailType.REMINDER else group_doc.send_summary_emails_month_day)
 		today = datetime.today()
 		if month_day < 0:
 			month_day += monthrange(today.year, today.month)[1] + 1
@@ -55,9 +63,10 @@ def is_current_day(group_doc):
 
 	return True
 
-def is_current_month(group_doc):
+def is_current_month(group_doc, email_type):
 	if group_doc.send_emails_frequency == 'Yearly':
-		return month_name[datetime.today().month] == group_doc.send_emails_month
+		month = group_doc.send_emails_month if email_type == EmailType.REMINDER else group_doc.send_summary_emails_month
+		return month_name[datetime.today().month] == month
 	return True
 
 def is_holiday_today(holiday_list):
@@ -67,12 +76,6 @@ def is_holiday_today(holiday_list):
 			dict(name=holiday_list, holiday_date=date)) and True or False
 	else:
 		return False
-
-def send_summary():
-	'''Send summary to everyone'''
-	for d in frappe.get_all('Regular Work Summary', dict(status='Open')):
-		regular_work_summary = frappe.get_doc('Regular Work Summary', d.name)
-		regular_work_summary.send_summary()
 
 def is_incoming_account_enabled():
 	return frappe.db.get_value('Email Account', dict(enable_incoming=1, default_incoming=1))

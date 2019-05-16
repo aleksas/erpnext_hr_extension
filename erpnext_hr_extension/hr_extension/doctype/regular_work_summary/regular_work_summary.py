@@ -11,6 +11,11 @@ from erpnext.hr.doctype.employee.employee import is_holiday
 from frappe.utils import global_date_format
 from six import string_types
 
+class EmailType:
+	REMINDER = 'Reminder'
+	SUMMARY = 'Summary'
+	BOTH = 'Both'
+
 class RegularWorkSummary(Document):
 	def send_mails(self, dws_group, emails):
 		'''Send emails to get regular work summary to all users \
@@ -31,7 +36,7 @@ class RegularWorkSummary(Document):
 	def send_summary(self):
 		'''Send summary of all replies. Called at midnight'''
 		args = self.get_message_details()
-		emails = get_user_emails_from_group(self.regular_work_summary_group, 'Summary')
+		emails = get_user_emails_from_group(self.regular_work_summary_group, EmailType.SUMMARY)
 		frappe.sendmail(recipients=emails,
 			template='daily_work_summary',
 			args=args,
@@ -103,7 +108,7 @@ class RegularWorkSummary(Document):
 			did_not_reply=', '.join(did_not_reply) or '',
 			did_not_reply_title=_('No replies from'))
 
-def get_user_emails_from_group(group, receive='Both'):
+def get_user_emails_from_group(group, receive=EmailType.BOTH):
 	'''Returns list of email of enabled users from the given group
 
 	:param group: Regular Work Summary Group `name`'''
@@ -117,4 +122,4 @@ def get_user_emails_from_group(group, receive='Both'):
 
 def get_users_email(doc, receive):
 	return [d.email for d in doc.users
-		if frappe.db.get_value("User", d.user, "enabled") and (d.receive == receive or d.receive == 'Both')]
+		if frappe.db.get_value("User", d.user, "enabled") and (d.receive == receive or d.receive == EmailType.BOTH)]
