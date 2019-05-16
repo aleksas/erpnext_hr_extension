@@ -50,7 +50,7 @@ def get_data(filters):
 			order_by='creation asc')
 	data = []
 	total = len(regular_summary_emails)
-	for user in get_user_emails_from_group(filters.group, EmailType.REMINDER):
+	for user in get_user_emails_from_group(filters.group, EmailType.REQUEST):
 		user_name = frappe.get_value('User', user, 'full_name')
 		count = len([d for d in replies if d.sender == user])
 		data.append([user_name, count, total])
