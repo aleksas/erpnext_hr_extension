@@ -47,15 +47,15 @@ def trigger_emails():
 					regular_work_summary.send_summary()
 
 def is_current_hour(group_doc, email_type):
-	hour = group_doc.send_emails_at if email_type == EmailType.REQUEST else group_doc.send_summary_emails_at
+	hour = group_doc.send_request_emails_at if email_type == EmailType.REQUEST else group_doc.send_summary_emails_at
 	return frappe.utils.nowtime().split(':')[0] == hour.split(':')[0]
 
 def is_current_day(group_doc, frequency, email_type):
 	if frequency == 'Weekly':
-		week_day = group_doc.send_emails_week_day if email_type == EmailType.REQUEST else group_doc.send_summary_emails_week_day
+		week_day = group_doc.send_request_emails_week_day if email_type == EmailType.REQUEST else group_doc.send_summary_emails_week_day
 		return day_name[datetime.today().weekday()] == week_day
 	elif frequency in ['Monthly', 'Yearly']:
-		month_day = int(group_doc.send_emails_month_day if email_type == EmailType.REQUEST else group_doc.send_summary_emails_month_day)
+		month_day = int(group_doc.send_request_emails_month_day if email_type == EmailType.REQUEST else group_doc.send_summary_emails_month_day)
 		today = datetime.today()
 		if month_day < 0:
 			month_day += monthrange(today.year, today.month)[1] + 1
@@ -65,7 +65,7 @@ def is_current_day(group_doc, frequency, email_type):
 
 def is_current_month(group_doc, frequency, email_type):
 	if frequency == 'Yearly':
-		month = group_doc.send_emails_month if email_type == EmailType.REQUEST else group_doc.send_summary_emails_month
+		month = group_doc.send_request_emails_month if email_type == EmailType.REQUEST else group_doc.send_summary_emails_month
 		return month_name[datetime.today().month] == month
 	return True
 
