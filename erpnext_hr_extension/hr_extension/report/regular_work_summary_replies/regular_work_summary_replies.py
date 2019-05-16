@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 from frappe import _
 import frappe
-from erpnext_hr_extension.hr_extension.doctype.regular_work_summary.regular_work_summary import get_user_emails_from_group
+from erpnext_hr_extension.hr_extension.doctype.regular_work_summary.regular_work_summary import get_user_emails_from_group, EmailType
 
 def execute(filters=None):
 	if not filters.group: return [], []
@@ -50,7 +50,7 @@ def get_data(filters):
 			order_by='creation asc')
 	data = []
 	total = len(regular_summary_emails)
-	for user in get_user_emails_from_group(filters.group):
+	for user in get_user_emails_from_group(filters.group, EmailType.REMINDER):
 		user_name = frappe.get_value('User', user, 'full_name')
 		count = len([d for d in replies if d.sender == user])
 		data.append([user_name, count, total])
