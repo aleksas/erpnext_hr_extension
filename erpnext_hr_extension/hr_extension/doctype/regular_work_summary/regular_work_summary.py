@@ -12,7 +12,7 @@ from frappe.utils import global_date_format
 from six import string_types
 
 class EmailType:
-	REMINDER = 'Reminder'
+	REQUEST = 'Request'
 	SUMMARY = 'Summary'
 	BOTH = 'Both'
 
