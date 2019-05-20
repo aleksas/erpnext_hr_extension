@@ -25,7 +25,7 @@ def trigger_emails():
 	for d in groups:
 		group_doc = frappe.get_doc("Regular Work Summary Group", d)
 		frequency = group_doc.send_emails_frequency
-		group_enabled_and_not_holiday = group_doc.enabled and (frequency == 'Daily' and not is_holiday_today(group_doc.holiday_list))
+		group_enabled_and_not_holiday = group_doc.enabled and (not frequency == 'Daily' or not is_holiday_today(group_doc.holiday_list))
 
 		if group_enabled_and_not_holiday:			
 			# First check reponses and send summaries if summaries and requests are sent at the same time
