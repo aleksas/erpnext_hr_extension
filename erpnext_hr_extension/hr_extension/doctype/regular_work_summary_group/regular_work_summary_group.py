@@ -19,14 +19,24 @@ class RegularWorkSummaryGroup(Document):
 
 def trigger_emails():
 	'''Send emails to Employees at the given hour asking
-			them what did they work on today'''
+		them what did they work on during the specified time interval
+		and also send summaries'''
 	groups = frappe.get_all("Regular Work Summary Group")
 	for d in groups:
 		group_doc = frappe.get_doc("Regular Work Summary Group", d)
 		frequency = group_doc.send_emails_frequency
-		group_enabled_and_not_holiday = (frequency == 'Daily' and not is_holiday_today(group_doc.holiday_list)) and group_doc.enabled
+		group_enabled_and_not_holiday = group_doc.enabled and (frequency == 'Daily' and not is_holiday_today(group_doc.holiday_list))
 
-		if group_enabled_and_not_holiday:
+		if group_enabled_and_not_holiday:			
+			# First check reponses and send summaries if summaries and requests are sent at the same time
+			if (is_current_hour(group_doc, EmailType.SUMMARY)
+				and is_current_day(group_doc, frequency, EmailType.SUMMARY)
+				and is_current_month(group_doc, frequency, EmailType.SUMMARY)):
+
+				for d in frappe.get_all('Regular Work Summary', dict(status='Open', regular_work_summary_group=group_doc.name)):
+					regular_work_summary = frappe.get_doc('Regular Work Summary', d.name)
+					regular_work_summary.send_summary()
+
 			if (is_current_hour(group_doc, EmailType.REQUEST)
 				and is_current_day(group_doc, frequency, EmailType.REQUEST)
 				and is_current_month(group_doc, frequency, EmailType.REQUEST)):
@@ -37,14 +47,6 @@ def trigger_emails():
 						dict(doctype='Regular Work Summary', regular_work_summary_group=group_doc.name)
 					).insert()
 					regular_work_summary.send_mails(group_doc, emails)
-			
-			if (is_current_hour(group_doc, EmailType.SUMMARY)
-				and is_current_day(group_doc, frequency, EmailType.SUMMARY)
-				and is_current_month(group_doc, frequency, EmailType.SUMMARY)):
-
-				for d in frappe.get_all('Regular Work Summary', dict(status='Open', regular_work_summary_group=group_doc.name)):
-					regular_work_summary = frappe.get_doc('Regular Work Summary', d.name)
-					regular_work_summary.send_summary()
 
 def is_current_hour(group_doc, email_type):
 	hour = group_doc.send_request_emails_at if email_type == EmailType.REQUEST else group_doc.send_summary_emails_at
